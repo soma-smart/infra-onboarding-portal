@@ -81,10 +81,10 @@
 <body>
   <div class="card">
     <div class="logo">Soma Smart</div>
-    <h1>Demande d'accès infrastructure</h1>
+    <h1>Accès aux applications du datacenter</h1>
     <p class="subtitle">
-      Remplissez ce formulaire pour demander un accès SSH aux serveurs et/ou un accès Rancher/kubectl.<br>
-      Votre demande sera examinée par un administrateur avant d'être traitée.
+      Les applications internes (Airflow, Superset, Outline, OpenProject…) sont hébergées dans notre datacenter et accessibles via VPN.<br><br>
+      Remplissez ce formulaire pour demander un accès. Un administrateur traitera votre demande et vous contactera pour finaliser la configuration.
     </p>
 
     <form id="form">
@@ -103,26 +103,26 @@
       </div>
 
       <div class="field">
-        <label>Accès Rancher / kubectl <span style="color:#888;font-weight:400">(optionnel)</span></label>
+        <label>Application concernée <span style="color:#888;font-weight:400">(optionnel)</span></label>
         <select id="group">
-          <option value="">— Accès SSH uniquement —</option>
-          <option value="k3s-admins">k3s-admins</option>
-          <option value="k3s-dev-airflow">k3s-dev-airflow</option>
-          <option value="k3s-dev-airflow-dev">k3s-dev-airflow-dev</option>
-          <option value="k3s-dev-cv-generator">k3s-dev-cv-generator</option>
-          <option value="k3s-dev-dss-to-spark">k3s-dev-dss-to-spark</option>
-          <option value="k3s-dev-finops">k3s-dev-finops</option>
-          <option value="k3s-dev-jenius">k3s-dev-jenius</option>
-          <option value="k3s-dev-le-coffre">k3s-dev-le-coffre</option>
-          <option value="k3s-dev-openproject">k3s-dev-openproject</option>
-          <option value="k3s-dev-outline">k3s-dev-outline</option>
-          <option value="k3s-dev-qdrant">k3s-dev-qdrant</option>
-          <option value="k3s-dev-som-portal">k3s-dev-som-portal</option>
-          <option value="k3s-dev-som-recover">k3s-dev-som-recover</option>
-          <option value="k3s-dev-superset">k3s-dev-superset</option>
-          <option value="k3s-dev-website">k3s-dev-website</option>
+          <option value="">— Accès général uniquement —</option>
+          <option value="k3s-admins">Administration cluster</option>
+          <option value="k3s-dev-airflow">Airflow</option>
+          <option value="k3s-dev-airflow-dev">Airflow (dev)</option>
+          <option value="k3s-dev-cv-generator">CV Generator</option>
+          <option value="k3s-dev-dss-to-spark">DSS to Spark</option>
+          <option value="k3s-dev-finops">FinOps</option>
+          <option value="k3s-dev-jenius">Jenius</option>
+          <option value="k3s-dev-le-coffre">Le Coffre</option>
+          <option value="k3s-dev-openproject">OpenProject</option>
+          <option value="k3s-dev-outline">Outline (base de connaissance)</option>
+          <option value="k3s-dev-qdrant">Qdrant</option>
+          <option value="k3s-dev-som-portal">Som Portal</option>
+          <option value="k3s-dev-som-recover">Som Recover</option>
+          <option value="k3s-dev-superset">Superset</option>
+          <option value="k3s-dev-website">Website</option>
         </select>
-        <p class="hint">Sélectionner uniquement si vous avez besoin d'accéder à Rancher ou kubectl.</p>
+        <p class="hint">Sélectionner si vous avez besoin d'accéder à une application spécifique via Rancher.</p>
       </div>
 
       <button type="submit" id="btn">Envoyer la demande</button>
