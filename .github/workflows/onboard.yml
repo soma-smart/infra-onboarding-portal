@@ -58,7 +58,8 @@ jobs:
           az login --service-principal \
             --username "${{ secrets.AZURE_CLIENT_ID }}" \
             --password "${{ secrets.AZURE_CLIENT_SECRET }}" \
-            --tenant "${{ secrets.AZURE_TENANT_ID }}"
+            --tenant "${{ secrets.AZURE_TENANT_ID }}" \
+            --allow-no-subscriptions
 
       - name: Write public key to temp file
         run: printf '%s\n' "${{ steps.parse.outputs.pubkey }}" > /tmp/onboard_pubkey.pub
