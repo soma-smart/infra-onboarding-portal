@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande d'accès infrastructure — Soma Smart</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 560px;
+    }
+    .logo { font-weight: 700; font-size: 1.1rem; color: #1a1a2e; margin-bottom: 0.25rem; }
+    h1 { font-size: 1.4rem; color: #1a1a2e; margin-bottom: 0.5rem; }
+    .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 2rem; line-height: 1.5; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 500; color: #333; margin-bottom: 0.375rem; }
+    label .required { color: #e53e3e; }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    textarea {
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 0.8rem;
+      resize: vertical;
+      min-height: 100px;
+    }
+    .hint { font-size: 0.78rem; color: #888; margin-top: 0.25rem; }
+    .hint code { background: #f3f4f6; padding: 0.1em 0.3em; border-radius: 3px; }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.5rem;
+    }
+    button:hover { background: #4338ca; }
+    button:disabled { background: #a5a3e8; cursor: not-allowed; }
+    .message {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .message.error   { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Soma Smart</div>
+    <h1>Demande d'accès infrastructure</h1>
+    <p class="subtitle">
+      Remplissez ce formulaire pour demander un accès SSH aux serveurs et/ou un accès Rancher/kubectl.<br>
+      Votre demande sera examinée par un administrateur avant d'être traitée.
+    </p>
+
+    <form id="form">
+      <div class="field">
+        <label>Email <span class="required">*</span></label>
+        <input type="email" id="email" placeholder="prenom.nom@soma-smart.com" required>
+      </div>
+
+      <div class="field">
+        <label>Clé publique SSH <span class="required">*</span></label>
+        <textarea id="pubkey" placeholder="ssh-ed25519 AAAA..." required></textarea>
+        <p class="hint">
+          Collez le contenu de votre fichier <code>~/.ssh/id_ed25519.pub</code>.<br>
+          Si vous n'en avez pas, générez-en une avec : <code>ssh-keygen -t ed25519</code>
+        </p>
+      </div>
+
+      <div class="field">
+        <label>Accès Rancher / kubectl <span style="color:#888;font-weight:400">(optionnel)</span></label>
+        <select id="group">
+          <option value="">— Accès SSH uniquement —</option>
+          <option value="k3s-admins">k3s-admins</option>
+          <option value="k3s-dev-airflow">k3s-dev-airflow</option>
+          <option value="k3s-dev-airflow-dev">k3s-dev-airflow-dev</option>
+          <option value="k3s-dev-cv-generator">k3s-dev-cv-generator</option>
+          <option value="k3s-dev-dss-to-spark">k3s-dev-dss-to-spark</option>
+          <option value="k3s-dev-finops">k3s-dev-finops</option>
+          <option value="k3s-dev-jenius">k3s-dev-jenius</option>
+          <option value="k3s-dev-le-coffre">k3s-dev-le-coffre</option>
+          <option value="k3s-dev-openproject">k3s-dev-openproject</option>
+          <option value="k3s-dev-outline">k3s-dev-outline</option>
+          <option value="k3s-dev-qdrant">k3s-dev-qdrant</option>
+          <option value="k3s-dev-som-portal">k3s-dev-som-portal</option>
+          <option value="k3s-dev-som-recover">k3s-dev-som-recover</option>
+          <option value="k3s-dev-superset">k3s-dev-superset</option>
+          <option value="k3s-dev-website">k3s-dev-website</option>
+        </select>
+        <p class="hint">Sélectionner uniquement si vous avez besoin d'accéder à Rancher ou kubectl.</p>
+      </div>
+
+      <button type="submit" id="btn">Envoyer la demande</button>
+      <div class="message" id="msg"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn');
+      const msg = document.getElementById('msg');
+      const email  = document.getElementById('email').value.trim();
+      const pubkey = document.getElementById('pubkey').value.trim();
+      const group  = document.getElementById('group').value;
+
+      if (!email.endsWith('@soma-smart.com')) {
+        show('error', 'L\'email doit être @soma-smart.com.');
+        return;
+      }
+
+      const keyType = pubkey.split(' ')[0];
+      if (!['ssh-ed25519', 'ssh-rsa', 'ecdsa-sha2-nistp256'].includes(keyType)) {
+        show('error', 'Clé SSH invalide — elle doit commencer par ssh-ed25519, ssh-rsa ou ecdsa-sha2-nistp256.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours...';
+      msg.style.display = 'none';
+
+      try {
+        const res = await fetch('/.netlify/functions/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, pubkey, group }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          show('success', 'Demande envoyée. Un administrateur va l\'examiner et vous contacter une fois l\'accès configuré.');
+          document.getElementById('form').reset();
+        } else {
+          throw new Error(data.error || 'Erreur inconnue');
+        }
+      } catch (err) {
+        show('error', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer la demande';
+      }
+
+      function show(type, text) {
+        msg.className = 'message ' + type;
+        msg.textContent = text;
+        msg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
