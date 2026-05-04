@@ -64,11 +64,12 @@ jobs:
         run: printf '%s\n' "${{ steps.parse.outputs.pubkey }}" > /tmp/onboard_pubkey.pub
 
       - name: Run onboarding script
+        working-directory: infra
         run: |
           GROUP="${{ steps.parse.outputs.group }}"
           ARGS=("${{ steps.parse.outputs.email }}" /tmp/onboard_pubkey.pub)
           [[ -n "${GROUP}" ]] && ARGS+=("${GROUP}")
-          bash infra/scripts/onboard-devops-user.sh "${ARGS[@]}"
+          bash scripts/onboard-devops-user.sh "${ARGS[@]}"
 
       - name: Comment success on issue
         if: success()
