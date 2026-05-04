@@ -155,17 +155,43 @@
       msg.style.display = 'none';
 
       try {
-        const res = await fetch('/.netlify/functions/submit', {
+        const groupLabel = group || 'Aucun (SSH uniquement)';
+        const issueBody = [
+          "## Demande d'onboarding",
+          '',
+          `**Email:** ${email}`,
+          `**Groupe Entra ID:** ${groupLabel}`,
+          '',
+          '**Clé publique SSH:**',
+          '```',
+          pubkey,
+          '```',
+          '',
+          '---',
+          "*Soumis via le portail d'onboarding — ajouter le label `approved` pour déclencher l'onboarding automatique.*",
+        ].join('\n');
+
+        const res = await fetch('https://api.github.com/repos/soma-smart/infra-onboarding-portal/issues', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, pubkey, group }),
+          headers: {
+            Authorization: 'Bearer __GITHUB_PAT__',
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: `Onboarding : ${email}`,
+            body: issueBody,
+            labels: ['onboarding', 'pending'],
+          }),
         });
-        const data = await res.json();
+
         if (res.ok) {
           show('success', 'Demande envoyée. Un administrateur va l\'examiner et vous contacter une fois l\'accès configuré.');
           document.getElementById('form').reset();
         } else {
-          throw new Error(data.error || 'Erreur inconnue');
+          const data = await res.json();
+          throw new Error(data.message || 'Erreur inconnue');
         }
       } catch (err) {
         show('error', err.message);
