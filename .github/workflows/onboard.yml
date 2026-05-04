@@ -52,10 +52,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H 10.0.30.200 10.0.30.201 10.0.30.202 >> ~/.ssh/known_hosts
 
-      - name: Install Azure CLI
-        if: steps.parse.outputs.group != ''
-        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
       - name: Azure login
         if: steps.parse.outputs.group != ''
         run: |
