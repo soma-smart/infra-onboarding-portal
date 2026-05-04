@@ -84,7 +84,8 @@
     <h1>Accès aux applications du datacenter</h1>
     <p class="subtitle">
       Les applications internes (Airflow, Superset, Outline, OpenProject…) sont hébergées dans notre datacenter et accessibles via VPN.<br><br>
-      Remplissez ce formulaire pour demander un accès. Un administrateur traitera votre demande et vous contactera pour finaliser la configuration.
+      Remplissez ce formulaire pour demander un accès. Un administrateur traitera votre demande et vous contactera pour finaliser la configuration.<br><br>
+      <strong>Note :</strong> seul l'environnement de développement est disponible pour le moment.
     </p>
 
     <form id="form">
@@ -106,21 +107,21 @@
         <label>Application concernée <span style="color:#888;font-weight:400">(optionnel)</span></label>
         <select id="group">
           <option value="">— Accès général uniquement —</option>
-          <option value="k3s-admins">Administration cluster</option>
-          <option value="k3s-dev-airflow">Airflow</option>
-          <option value="k3s-dev-airflow-dev">Airflow (dev)</option>
-          <option value="k3s-dev-cv-generator">CV Generator</option>
-          <option value="k3s-dev-dss-to-spark">DSS to Spark</option>
-          <option value="k3s-dev-finops">FinOps</option>
-          <option value="k3s-dev-jenius">Jenius</option>
-          <option value="k3s-dev-le-coffre">Le Coffre</option>
-          <option value="k3s-dev-openproject">OpenProject</option>
-          <option value="k3s-dev-outline">Outline (base de connaissance)</option>
-          <option value="k3s-dev-qdrant">Qdrant</option>
-          <option value="k3s-dev-som-portal">Som Portal</option>
-          <option value="k3s-dev-som-recover">Som Recover</option>
-          <option value="k3s-dev-superset">Superset</option>
-          <option value="k3s-dev-website">Website</option>
+          <option value="k3s-admins">Administration cluster (dev)</option>
+          <option value="k3s-dev-airflow">Airflow (dev)</option>
+          <option value="k3s-dev-airflow-dev">Airflow — environnement de développement</option>
+          <option value="k3s-dev-cv-generator">CV Generator (dev)</option>
+          <option value="k3s-dev-dss-to-spark">DSS to Spark (dev)</option>
+          <option value="k3s-dev-finops">FinOps (dev)</option>
+          <option value="k3s-dev-jenius">Jenius (dev)</option>
+          <option value="k3s-dev-le-coffre">Le Coffre (dev)</option>
+          <option value="k3s-dev-openproject">OpenProject (dev)</option>
+          <option value="k3s-dev-outline">Outline — base de connaissance (dev)</option>
+          <option value="k3s-dev-qdrant">Qdrant (dev)</option>
+          <option value="k3s-dev-som-portal">Som Portal (dev)</option>
+          <option value="k3s-dev-som-recover">Som Recover (dev)</option>
+          <option value="k3s-dev-superset">Superset (dev)</option>
+          <option value="k3s-dev-website">Website (dev)</option>
         </select>
         <p class="hint">Sélectionner si vous avez besoin d'accéder à une application spécifique via Rancher.</p>
       </div>
