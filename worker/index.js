@@ -3,6 +3,18 @@ const GITHUB_API = 'https://api.github.com/repos/soma-smart/infra-onboarding-por
 
 export default {
   async fetch(request, env) {
+    try {
+      return await handleRequest(request, env);
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message, type: err.name }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  },
+};
+
+async function handleRequest(request, env) {
     const origin = request.headers.get('Origin') ?? '';
 
     if (request.method === 'OPTIONS') {
@@ -48,29 +60,40 @@ export default {
       "*Soumis via le portail d'onboarding — ajouter le label `approved` pour déclencher l'onboarding automatique.*",
     ].join('\n');
 
-    const ghRes = await fetch(GITHUB_API, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${env.ISSUES_PAT}`,
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: `Onboarding : ${email}`,
-        body: issueBody,
-        labels: ['onboarding', 'pending'],
-      }),
-    });
+    let ghRes;
+    try {
+      ghRes = await fetch(GITHUB_API, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.ISSUES_PAT}`,
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'Content-Type': 'application/json',
+          'User-Agent': 'soma-smart-onboarding-portal',
+        },
+        body: JSON.stringify({
+          title: `Onboarding : ${email}`,
+          body: issueBody,
+          labels: ['onboarding', 'pending'],
+        }),
+      });
+    } catch (err) {
+      return json({ error: `GitHub fetch error: ${err.message}` }, 500, origin);
+    }
 
     if (!ghRes.ok) {
-      const data = await ghRes.json();
-      return json({ error: data.message || 'Erreur GitHub' }, 502, origin);
+      let errorMsg = `GitHub ${ghRes.status}`;
+      try {
+        const data = await ghRes.json();
+        errorMsg = data.message || errorMsg;
+      } catch {
+        errorMsg = (await ghRes.text().catch(() => '')) || errorMsg;
+      }
+      return json({ error: errorMsg }, 502, origin);
     }
 
     return json({ ok: true }, 200, origin);
-  },
-};
+}
 
 function corsHeaders() {
   return {
