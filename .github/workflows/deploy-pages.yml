@@ -24,9 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Inject PAT into index.html
-        run: sed -i "s/__GITHUB_PAT__/${{ secrets.ISSUES_PAT }}/g" index.html
-
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
