@@ -168,19 +168,10 @@
           "*Soumis via le portail d'onboarding — ajouter le label `approved` pour déclencher l'onboarding automatique.*",
         ].join('\n');
 
-        const res = await fetch('https://api.github.com/repos/soma-smart/infra-onboarding-portal/issues', {
+        const res = await fetch('https://onboarding-proxy.gmalonga.workers.dev', {
           method: 'POST',
-          headers: {
-            Authorization: 'Bearer __GITHUB_PAT__',
-            Accept: 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: `Onboarding : ${email}`,
-            body: issueBody,
-            labels: ['onboarding', 'pending'],
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, pubkey, group }),
         });
 
         if (res.ok) {
