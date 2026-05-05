@@ -179,7 +179,7 @@
           document.getElementById('form').reset();
         } else {
           const data = await res.json();
-          throw new Error(data.message || 'Erreur inconnue');
+          throw new Error(data.error || data.message || 'Erreur inconnue');
         }
       } catch (err) {
         show('error', err.message);
