@@ -46,6 +46,7 @@ jobs:
           GROUP="${{ steps.parse.outputs.group }}"
           USER_ID=$(az ad user show --id "${EMAIL}" --query id -o tsv)
           az ad group member remove --group "${GROUP}" --member-id "${USER_ID}"
+          sleep 5
           IS_MEMBER=$(az ad group member check --group "${GROUP}" --member-id "${USER_ID}" --query value -o tsv)
           if [[ "${IS_MEMBER}" =~ [Tt]rue ]]; then
             echo "ERREUR : l'utilisateur est toujours membre du groupe." >&2
