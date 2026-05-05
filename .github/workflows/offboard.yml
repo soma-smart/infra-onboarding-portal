@@ -1,0 +1,91 @@
+name: Offboard user
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  offboard:
+    if: github.event.label.name == 'revoke'
+    runs-on: onprem-onboarding
+    permissions:
+      issues: write
+
+    steps:
+      - name: Parse issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body;
+
+            const email = body.match(/\*\*Email:\*\* (.+)/)?.[1]?.trim() ?? '';
+            const rawGroup = body.match(/\*\*Groupe Entra ID:\*\* (.+)/)?.[1]?.trim() ?? '';
+            const group = rawGroup === 'Aucun' ? '' : rawGroup;
+
+            if (!email) {
+              core.setFailed("Impossible de parser l'email dans l'issue.");
+            }
+
+            core.setOutput('email', email);
+            core.setOutput('group', group);
+
+      - name: Azure login
+        if: steps.parse.outputs.group != ''
+        run: |
+          az login --service-principal \
+            --username "${{ secrets.AZURE_CLIENT_ID }}" \
+            --password "${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.AZURE_TENANT_ID }}" \
+            --allow-no-subscriptions
+
+      - name: Remove from Entra ID group
+        if: steps.parse.outputs.group != ''
+        run: |
+          EMAIL="${{ steps.parse.outputs.email }}"
+          GROUP="${{ steps.parse.outputs.group }}"
+          USER_ID=$(az ad user show --id "${EMAIL}" --query id -o tsv)
+          az ad group member remove --group "${GROUP}" --member-id "${USER_ID}"
+          IS_MEMBER=$(az ad group member check --group "${GROUP}" --member-id "${USER_ID}" --query value -o tsv)
+          if [[ "${IS_MEMBER}" =~ [Tt]rue ]]; then
+            echo "ERREUR : l'utilisateur est toujours membre du groupe." >&2
+            exit 1
+          fi
+          echo "✓ ${EMAIL} retiré du groupe ${GROUP}"
+
+      - name: Comment success on issue
+        if: success()
+        uses: actions/github-script@v7
+        env:
+          GROUP: ${{ steps.parse.outputs.group }}
+        with:
+          script: |
+            const group = process.env.GROUP;
+            const groupNote = group ? ` Retiré du groupe Entra ID **${group}**.` : '';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: `✅ Offboarding terminé avec succès.${groupNote}`,
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['offboarding', 'done'],
+            });
+
+      - name: Comment failure on issue
+        if: failure()
+        uses: actions/github-script@v7
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: `❌ Offboarding échoué — voir les [logs du workflow](${process.env.RUN_URL}).`,
+            });
