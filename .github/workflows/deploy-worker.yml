@@ -22,7 +22,7 @@ jobs:
         working-directory: worker
         run: npm test
 
-      - name: Ensure workers.dev subdomain is registered
+      - name: Check workers.dev subdomain
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -32,15 +32,12 @@ jobs:
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" | jq -r '.result.subdomain // empty')
           if [ -z "$SUBDOMAIN" ]; then
-            echo "No workers.dev subdomain found. Registering one..."
-            curl -s -X POST \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/subdomain" \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "{\"subdomain\":\"soma-smart\"}" | jq .
-          else
-            echo "workers.dev subdomain already registered: $SUBDOMAIN"
+            echo "::error::No workers.dev subdomain registered for this Cloudflare account."
+            echo "::error::Please register one manually at: https://dash.cloudflare.com/workers/onboarding"
+            exit 1
           fi
+          echo "workers.dev subdomain: $SUBDOMAIN"
+          echo "WORKERS_SUBDOMAIN=$SUBDOMAIN" >> $GITHUB_ENV
 
       - name: Deploy Worker
         working-directory: worker
