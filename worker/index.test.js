@@ -72,7 +72,7 @@ describe('onboarding-proxy worker', () => {
     const req = makeRequest({
       email: 'jdupont@soma-smart.com',
       pubkey: 'ssh-ed25519 AAAA jdupont',
-      group: 'k3s-dev-airflow-dev',
+      groups: ['k3s-dev-airflow-dev', 'k3s-dev-outline'],
     });
     const res = await worker.fetch(req, mockEnv);
     expect(res.status).toBe(200);

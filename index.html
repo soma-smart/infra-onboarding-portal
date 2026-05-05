@@ -66,6 +66,33 @@
     }
     button:hover { background: #4338ca; }
     button:disabled { background: #a5a3e8; cursor: not-allowed; }
+    .checkbox-group {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.625rem 0.75rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem 1rem;
+    }
+    .cb-item {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #374151;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .cb-item input[type="checkbox"] {
+      width: auto;
+      padding: 0;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      cursor: pointer;
+      accent-color: #4f46e5;
+      flex-shrink: 0;
+    }
     .message {
       margin-top: 1rem;
       padding: 0.75rem 1rem;
@@ -104,22 +131,21 @@
       </div>
 
       <div class="field">
-        <label>Application concernée <span style="color:#888;font-weight:400">(optionnel)</span></label>
-        <select id="group">
-          <option value="">— Accès général uniquement —</option>
-          <option value="k3s-admins">Administration cluster</option>
-          <option value="k3s-dev-airflow">Airflow</option>
-          <option value="k3s-dev-airflow-dev">Airflow (dev)</option>
-          <option value="k3s-dev-dss-to-spark">DSS to Spark</option>
-          <option value="k3s-dev-finops">FinOps</option>
-          <option value="k3s-dev-le-coffre">Le Coffre</option>
-          <option value="k3s-dev-openproject">OpenProject</option>
-          <option value="k3s-dev-outline">Outline</option>
-          <option value="k3s-dev-som-portal">Som Portal</option>
-          <option value="k3s-dev-som-recover">Som Recover</option>
-          <option value="k3s-dev-superset">Superset</option>
-        </select>
-        <p class="hint">Sélectionner si vous avez besoin d'accéder à une application spécifique via Rancher.</p>
+        <label>Applications concernées <span style="color:#888;font-weight:400">(optionnel)</span></label>
+        <div class="checkbox-group">
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-admins"> Administration cluster</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-airflow"> Airflow</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-airflow-dev"> Airflow (dev)</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-dss-to-spark"> DSS to Spark</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-finops"> FinOps</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-le-coffre"> Le Coffre</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-openproject"> OpenProject</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-outline"> Outline</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-som-portal"> Som Portal</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-som-recover"> Som Recover</label>
+          <label class="cb-item"><input type="checkbox" class="group-cb" value="k3s-dev-superset"> Superset</label>
+        </div>
+        <p class="hint">Cochez les applications auxquelles vous souhaitez accéder via Rancher.</p>
       </div>
 
       <button type="submit" id="btn">Envoyer la demande</button>
@@ -134,7 +160,7 @@
       const msg = document.getElementById('msg');
       const email  = document.getElementById('email').value.trim();
       const pubkey = document.getElementById('pubkey').value.trim();
-      const group  = document.getElementById('group').value;
+      const groups = Array.from(document.querySelectorAll('.group-cb:checked')).map(cb => cb.value);
 
       if (!email.endsWith('@soma-smart.com')) {
         show('error', 'L\'email doit être @soma-smart.com.');
@@ -152,26 +178,10 @@
       msg.style.display = 'none';
 
       try {
-        const groupLabel = group || 'Aucun (SSH uniquement)';
-        const issueBody = [
-          "## Demande d'onboarding",
-          '',
-          `**Email:** ${email}`,
-          `**Groupe Entra ID:** ${groupLabel}`,
-          '',
-          '**Clé publique SSH:**',
-          '```',
-          pubkey,
-          '```',
-          '',
-          '---',
-          "*Soumis via le portail d'onboarding — ajouter le label `approved` pour déclencher l'onboarding automatique.*",
-        ].join('\n');
-
         const res = await fetch('https://onboarding-proxy.gmalonga.workers.dev', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, pubkey, group }),
+          body: JSON.stringify({ email, pubkey, groups }),
         });
 
         if (res.ok) {

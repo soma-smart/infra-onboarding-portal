@@ -39,17 +39,17 @@ async function handleRequest(request, env) {
       return json({ error: 'JSON invalide' }, 400, origin);
     }
 
-    const { email, pubkey, group } = body ?? {};
+    const { email, pubkey, groups = [] } = body ?? {};
 
     if (!email) return json({ error: 'email est requis' }, 400, origin);
     if (!pubkey) return json({ error: 'pubkey est requis' }, 400, origin);
 
-    const groupLabel = group || 'Aucun (SSH uniquement)';
+    const groupsLabel = groups.length > 0 ? groups.join(', ') : 'Aucun (SSH uniquement)';
     const issueBody = [
       "## Demande d'onboarding",
       '',
       `**Email:** ${email}`,
-      `**Groupe Entra ID:** ${groupLabel}`,
+      `**Groupes Entra ID:** ${groupsLabel}`,
       '',
       '**Clé publique SSH:**',
       '```',
